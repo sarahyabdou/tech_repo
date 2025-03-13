@@ -10,6 +10,10 @@ from app.database import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.schema import UniqueConstraint, ForeignKeyConstraint
 
+from sqlalchemy.orm import registry
+
+mapper_registry = registry()
+
 class Module(Base):
     __tablename__ = 'modules'
     id = Column(Integer, primary_key=True)
@@ -57,7 +61,7 @@ class UserInfo(Base):
     password_hash = Column(String(200))
     gender = Column(String(10))
     leads = relationship("LeadsInfo", back_populates="assigned_user")
-
+    role_mappings = relationship("UserRoleMapping", back_populates="user")
 
 
 class UserRole(Base):
@@ -227,3 +231,4 @@ class ClientCalls(Base):
             ['calls_status.company_domain', 'calls_status.id']
         ),
     )
+mapper_registry.configure()

@@ -8,7 +8,6 @@ from app.database import get_db
 
 security = HTTPBasic()
 
-
 def authenticate_user(db: Session, username: str, password: str):
     user = db.query(UserInfo).filter(UserInfo.username == username).first()
     if not user:
@@ -17,8 +16,8 @@ def authenticate_user(db: Session, username: str, password: str):
         return False
     return user
 
-# Dependency to get the current user
 def get_current_user(credentials: HTTPBasicCredentials = Depends(security), db: Session = Depends(get_db)):
+    print("get_current_user called")  # Debugging
     user = authenticate_user(db, credentials.username, credentials.password)
     if not user:
         raise HTTPException(

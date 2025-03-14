@@ -231,4 +231,48 @@ class ClientCalls(Base):
             ['calls_status.company_domain', 'calls_status.id']
         ),
     )
+class EmployeesInfo(Base):
+    __tablename__ = 'employees_info'
+
+    date_added = Column(TIMESTAMP, server_default=func.now())
+    company_domain = Column(String(100), ForeignKey('company_info.company_domain'), primary_key=True)
+    employee_id = Column(Integer, primary_key=True, autoincrement=True)
+    contact_name = Column(String(50), nullable=False)
+    business_phone = Column(String(50))
+    personal_phone = Column(String(50))
+    business_email = Column(String(50))
+    personal_email = Column(String(50))
+    gender = Column(String(10))
+    is_company_admin = Column(Boolean)
+
+    user_uid = Column(UUID(as_uuid=True), unique=True)
+
+
+    salaries = relationship("EmployeesSalaries", back_populates="employee")
+class EmployeesSalaries(Base):
+    __tablename__ = 'employees_salaries'
+
+    company_domain = Column(String(100), primary_key=True)
+    employee_id = Column(Integer, primary_key=True)
+    gross_salary = Column(Numeric)
+    insurance = Column(Numeric)
+    taxes = Column(Numeric)
+    net_salary = Column(Numeric)
+    due_year = Column(Integer, primary_key=True)
+    due_month = Column(Integer, primary_key=True)
+    date_added = Column(TIMESTAMP, server_default=func.now())
+    due_date = Column(Date)
+
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['company_domain', 'employee_id'],
+            ['employees_info.company_domain', 'employees_info.employee_id']
+        ),
+    )
+
+
+    employee = relationship("EmployeesInfo", back_populates="salaries")
+
+
 mapper_registry.configure()

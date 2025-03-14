@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException,Header
 from sqlalchemy.orm import Session
 from app.database import get_db
+from app.auth import get_current_user
 from app.models import LeadsInfo, UserInfo,UserRolePermission,UserRoleMapping,ClientCalls,ClientMeetings
 from app.schemas import LeadCreate,UpdateLeadRequest
 from app.schemas import CallCreate,MeetingCreate,CallResponse,MeetingResponse,AllLeadsResponse,LeadResponse
-real_estate_router = APIRouter()
+real_estate_router = APIRouter(dependencies=[Depends(get_current_user)])
 
 @real_estate_router.post("/leads/")
 def add_lead(lead_data: LeadCreate, db: Session = Depends(get_db)):
-    # Check if the assigned user exists
+
     user = db.query(UserInfo).filter(UserInfo.id == lead_data.assigned_to).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
